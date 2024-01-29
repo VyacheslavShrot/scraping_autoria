@@ -1,0 +1,78 @@
+version: '3'
+services:
+
+  scraper:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - postgres
+      - firefox
+    environment:
+      - DB_HOST=postgres
+      - DB_DATABASE=scraping
+      - DB_USER=user_scraping
+      - DB_PASSWORD=123456789
+      - LOCAL_LAUNCH=False
+    command:
+      - ./run_script.sh
+    volumes:
+      - ./scraper.py:/app/scraper.py
+      - ./dumps:/app/dumps
+    networks:
+      - scraping_network
+
+  postgres:
+    image: postgres:11
+    environment:
+      POSTGRES_DB: scraping
+      POSTGRES_USER: user_scraping
+      POSTGRES_PASSWORD: 123456789
+    volumes:
+      - ./data:/var/lib/postgresql/data
+    networks:
+      - scraping_network
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=user@scraping.com
+      - PGADMIN_DEFAULT_PASSWORD=123456789
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    networks:
+      - scraping_network
+
+  firefox:
+    image: selenium/node-firefox:4.1.0-prerelease-20211105
+    shm_size: 3gb
+    mem_reservation: 1024m
+    depends_on:
+      - selenium-hub
+    environment:
+      - SE_EVENT_BUS_HOST=selenium-hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+    ports:
+      - "6902:5900"
+    networks:
+      - scraping_network
+
+  selenium-hub:
+    image: selenium/hub:4.1.0-prerelease-20211105
+    ports:
+      - "4442:4442"
+      - "4443:4443"
+      - "4444:4444"
+    shm_size: 3gb
+    mem_reservation: 1024m
+    networks:
+      - scraping_network
+
+networks:
+  scraping_network:
+
+volumes:
+  pg_dump_data:
