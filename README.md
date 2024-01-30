@@ -15,5 +15,5 @@
 - need to run <strong style="color:green">docker-compose up -d --build</strong>
 - using <strong style="color:green">FireFox</strong> as a scraping browser
 
-<strong style="color:lightblue">I did the project in a fast mode, so there are some shortcomings</strong>
+<strong style="color:lightblue">This project shows for the most part my work with asynchronous programming and database, and scraping technologies. I did the project in a fast mode, so there are some shortcomings)</strong>
 
